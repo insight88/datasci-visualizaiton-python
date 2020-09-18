@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 from data import countries_df
+from builders import make_table
 
 stylesheets = [
     "https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css",
@@ -11,16 +12,16 @@ stylesheets = [
 
 app = dash.Dash(__name__, external_stylesheets=stylesheets)
 
-# html.element로 태그를 생성하고 style={}로 css 설정 가능
-# ! react를 이용하기 때문에 style은 object notation으로 써야함
+
 app.layout = html.Div(
     style={
-        "textAlign": "center",
         "minHeight": "100vh",
-        "backgroundColor": "#11111",
+        "backgroundColor": "#111111",
         "color": "white",
-        "fontFamily": "Open Sans, sans-serif"
+        "fontFamily": "Open Sans, sans-serif",
     },
+    # html.element로 태그를 생성하고 style={}로 css 설정 가능
+    # ! react를 이용하기 때문에 style은 object notation으로 써야함
     children=[
         html.Header(
             style={"textAlign": "center", "paddingTop": "50px"},
@@ -30,38 +31,17 @@ app.layout = html.Div(
             children=[
                 html.Div(
                     children=[
-                        html.Table(
-                            children=[
-                                html.Thead(
-                                    children=[
-                                        html.Tr(
-                                            children=[
-                                                html.Th(
-                                                    column_name.replace("_", " "))
-                                                for column_name in countries_df.columns
-                                            ]
-                                        )
-                                    ]
-                                ),
-                                html.Tbody(
-                                    children=[
-                                        html.Tr(
-                                            children=[
-                                                html.Td(value_column)
-                                                for value_column in value
-                                            ]
-                                        )
-                                        for value in countries_df.values
-                                    ]
-                                ),
-                            ]
-                        )
+                        make_table(countries_df)
                     ]
                 )
             ]
         ),
     ],
 )
+
+map_figure = px.scatter_geo(countries_df)
+map_figure.show()
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
