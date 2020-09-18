@@ -2,7 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
-from data import countries_df
+from data import countries_df, totals_df
 from builders import make_table
 
 stylesheets = [
@@ -12,6 +12,45 @@ stylesheets = [
 
 app = dash.Dash(__name__, external_stylesheets=stylesheets)
 
+bubble_map = px.scatter_geo(
+    # * plotly.express scatter_geo를 사용, API 참조
+    countries_df,
+    title="Confirmed Cases by Countries",
+    hover_name="Country_Region",
+    hover_data={
+        "Confirmed": ":,2f",
+        "Recovered": ":,2f",
+        "Deaths": ":,2f",
+        "Country_Region": False
+    },
+    color="Confirmed",
+    locations="Country_Region",
+    locationmode="country names",
+    projection="natural earth",
+    color_continuous_scale=px.colors.sequential.Oryel,
+    size="Confirmed",
+    size_max=40,
+    template="plotly_dark"
+)
+
+bubble_map.update_layout(
+    margin=dict(l=0, r=0, t=50, b=0)
+)
+
+bars_graph = px.bar(
+    totals_df,
+    x="condition",
+    y="count",
+    color=["Confirmed", "Deaths", "Recovered"],
+    template="plotly_dark",
+    title="Total Global Cases",
+    hover_data={'count': ":,"},
+    labels={
+      "condition": "Condition",
+      "count": "Count",
+      "color": "Condition"
+    }
+)
 
 app.layout = html.Div(
     style={
@@ -28,14 +67,18 @@ app.layout = html.Div(
             children=[html.H1("Corona Dashboard", style={"fontSize": 40})],
         ),
         html.Div(
+            style={"display": "grid", "gap": 50,
+                   "gridTemplateColumns": "repeat(4, 1fr)"},
             children=[
-                html.Div(
-                    children=[
-                        make_table(countries_df)
-                    ]
-                )
+                html.Div(style={"grid-column": "span 3"},
+                         children=[dcc.Graph(figure=bubble_map)]),
+                html.Div(children=[make_table(countries_df)]),
             ]
         ),
+        html.Div(
+            style={"display": "grid", "gap": 50,
+                   "gridTemplateColumns": "repeat(4, 1fr)"},
+            children=[html.Div(children=[dcc.Graph(figure=bars_graph)])])
     ],
 )
 
