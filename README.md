@@ -2,4 +2,4 @@
 
 Used Libraries : Pandas, Plotly, Dash
 
-Deployed Address : https://corona-dashboard-pandas-plotly.herokuapp.com/
+Deployed Page Link : https://corona-dashboard-pandas-plotly.herokuapp.com/
